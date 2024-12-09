@@ -20,7 +20,7 @@ variables:
   dockerRegistryServiceConnection: '596527a0-844e-4fd1-af71-888334b640ff'
   imageRepository: 'sql-server-seed'
   containerRegistry: 'fiaptech3acr.azurecr.io'
-  dockerfilePath: '/sqlserver/Dockerfile'
+  dockerfilePath: '/sql-server/Dockerfile'
   tag: '$(Build.BuildId)'
 
   # Agent VM image name
