@@ -20,7 +20,7 @@ variables:
   dockerRegistryServiceConnection: '596527a0-844e-4fd1-af71-888334b640ff'
   imageRepository: 'sql-server-seed'
   containerRegistry: 'fiaptech3acr.azurecr.io'
-  dockerfilePath: '/sql-server/Dockerfile'
+  dockerfilePath: '**/Dockerfile'
   tag: '$(Build.BuildId)'
 
   # Agent VM image name
@@ -35,6 +35,11 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    - task: CmdLine@2
+      inputs:
+        script: |
+          echo Show ws files.
+          echo $(ls)
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
