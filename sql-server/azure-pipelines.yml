@@ -56,6 +56,8 @@ stages:
     displayName: "Upload Deployment YAML"
     dependsOn: Build
     steps:
+    - script: mkdir -p $(System.DefaultWorkingDirectory)/k8s
+      displayName: "Create artefact folder"
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: $(System.DefaultWorkingDirectory)/k8s
