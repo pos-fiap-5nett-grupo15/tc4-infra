@@ -69,10 +69,10 @@ stages:
     displayName: Deploy Sql Server to AKS
     steps:
       - task: DownloadPipelineArtifact@2
-      inputs:
-        buildTypo: 'current'
-        artifactName: $(k8s-deployment)
-        targetPath: $(System.DefaultWorkingDirectory)/k8s
+        inputs:
+          buildTypo: 'current'
+          artifactName: $(k8s-deployment)
+          targetPath: $(System.DefaultWorkingDirectory)/k8s
       - task: kubernetes@1
         displayName: "Apply Deployment YAML"
         inputs:
