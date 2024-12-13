@@ -21,6 +21,7 @@ variables:
   imageRepository: 'sql-server-seed'
   containerRegistry: 'fiaptech3acr.azurecr.io'
   dockerfilePath: 'sql-server/Dockerfile'
+  k8s-deployment: 'k8s-deployment-yaml'
   tag: '$(Build.BuildId)'
 
   # Agent VM image name
@@ -50,3 +51,36 @@ stages:
         tags: |
           $(tag)
           latest
+    
+  - job: UploadArtifact
+    displayName: "Upload Deployment YAML"
+    dependsOn: Build
+    steps:
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: $(System.DefaultWorkingDirectory)/k8s
+        artifact: $(k8s-deployment)
+        publishLocation: 'pipeline'
+
+- stage: Deploy
+  displayName: Deploy Stage
+  jobs:
+  - job: DeployDatabase
+    displayName: Deploy Sql Server to AKS
+    steps:
+      - task: DownloadPipelineArtifact@2
+      inputs:
+        buildTypo: 'current'
+        artifactName: $(k8s-deployment)
+        targetPath: $(System.DefaultWorkingDirectory)/k8s
+      - task: kubernetes@1
+        displayName: "Apply Deployment YAML"
+        inputs:
+          connectionType: 'Azure resource Manager'
+          azureSubscription: '7d56ed09-a476-4593-9fbf-0927c0c53f5e'
+          resourceGroup: fiap-tech3
+          kubernetesCluster: fiapaks
+          namespace: tc3
+          command: 'apply'
+          useConfigurableFile: true
+          configuration: '$(System.DefaultWorkingDirectory)/k8s/k8s-dev.yaml'
