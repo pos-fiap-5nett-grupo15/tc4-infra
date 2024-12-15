@@ -28,35 +28,14 @@ variables:
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
-stages:
-- stage: Build
-  displayName: Build and push stage
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
-    steps:
-    - task: CmdLine@2
-      inputs:
-        script: |
-          echo Show ws files.
-          echo $(ls)
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
-          latest
-    
   - job: UploadArtifact
     displayName: "Upload Deployment YAML"
-    dependsOn: Build
+    #dependsOn: Build
     steps:
+    - script: ls $(System.DefaultWorkingDirectory)
+      displayName: "Check folder $(System.DefaultWorkingDirectory)"
+    - script: ls $(Pipeline.Workspace)
+      displayName: "Check folder $(Pipeline.Workspace)"
     - script: mkdir -p $(System.DefaultWorkingDirectory)/$(k8sPathName)
       displayName: "Create artifact folder"
     - task: PublishPipelineArtifact@1
@@ -73,7 +52,7 @@ stages:
     steps:
       - task: DownloadPipelineArtifact@2
         inputs:
-          buildTypo: 'current'
+          buildType: 'current'
           artifactName: $(k8s-deployment)
           targetPath: $(System.DefaultWorkingDirectory)/$(k8sPathName)
       - task: kubernetes@1
@@ -81,8 +60,7 @@ stages:
         inputs:
           connectionType: 'Kubernetes Service Connection'
           kubernetesServiceEndpoint: 'fiap-aks-service-conn'
-          kubernetesCluster: 'fiapaks'
           namespace: 'tc3'
           command: 'apply'
           useConfigurableFile: true
-          configuration: '$(System.DefaultWorkingDirectory)/$($(k8sPathName)/k8s-dev.yaml'
+          configuration: '$(System.DefaultWorkingDirectory)/$(k8sPathName)/k8s-dev.yaml'
