@@ -48,7 +48,7 @@ stages:
   - job: DeployDatabase
     displayName: Deploy Sql Server to AKS
     steps:
-      - script: ls $(System.DefaultWorkingDirectory)
+      - script: ls $(System.DefaultWorkingDirectory)/sql-server
         displayName: "Check folder $(System.DefaultWorkingDirectory)"
       - task: DownloadPipelineArtifact@2
         inputs:
@@ -62,5 +62,4 @@ stages:
           kubernetesServiceEndpoint: 'fiap-aks-service-conn'
           namespace: 'tc3'
           command: apply
-          useConfigurableFile: true
-          configuration: $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
+          arguments: -f $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
