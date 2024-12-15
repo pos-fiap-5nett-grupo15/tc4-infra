@@ -80,8 +80,9 @@ stages:
         displayName: "Apply Deployment YAML"
         inputs:
           connectionType: 'Kubernetes Service Connection'
-          kubernetesServiceConnection: fiap-aks-service-conn
-          namespace: tc3
+          kubernetesServiceEndpoint: 'fiap-aks-service-conn'
+          kubernetesCluster: 'fiapaks'
+          namespace: 'tc3'
           command: 'apply'
           useConfigurableFile: true
           configuration: '$(System.DefaultWorkingDirectory)/$($(k8sPathName)/k8s-dev.yaml'
