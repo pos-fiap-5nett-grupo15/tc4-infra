@@ -8,7 +8,8 @@ steps:
   displayName: 'Test Service Connection'
   inputs:
     connectionType: 'Kubernetes Service Connection'
-    kubernetesServiceConnection: '<NOME_DA_SERVICE_CONNECTION>'
-    namespace: 'default' # Ou outro namespace que você queira testar
+    kubernetesServiceEndpoint: 'fiap-aks-service-conn'
+    kubernetesCluster: 'fiapaks'
+    namespace: 'tc3' # Ou outro namespace que você queira testar
     command: 'get'
     arguments: 'pods' # Pega a lista de pods no namespace especificado
