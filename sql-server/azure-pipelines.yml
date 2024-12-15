@@ -61,7 +61,5 @@ stages:
           connectionType: 'Kubernetes Service Connection'
           kubernetesServiceEndpoint: 'fiap-aks-service-conn'
           namespace: 'tc3'
-          command: 'apply'
-          useConfigurableFile: true
-          configurationType: configuration
-          configuration: '$(System.DefaultWorkingDirectory)/k8s.dev.yaml'
+          command: apply
+          arguments: -f '$(System.DefaultWorkingDirectory)/k8s.dev.yaml'
