@@ -43,7 +43,7 @@ stages:
       displayName: "Create artifact folder"
     - task: PublishPipelineArtifact@1
       inputs:
-        targetPath: $(System.DefaultWorkingDirectory)/$(k8sPathName)
+        targetPath: $(System.DefaultWorkingDirectory)/k8s.dev.yaml
         artifact: $(k8s-deployment)
         publishLocation: 'pipeline'
 
@@ -53,6 +53,8 @@ stages:
   - job: DeployDatabase
     displayName: Deploy Sql Server to AKS
     steps:
+      - script: ls $(System.DefaultWorkingDirectory)
+        displayName: "Check folder $(System.DefaultWorkingDirectory)"
       - task: DownloadPipelineArtifact@2
         inputs:
           buildType: 'current'
