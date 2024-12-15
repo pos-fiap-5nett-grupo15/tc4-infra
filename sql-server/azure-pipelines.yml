@@ -55,6 +55,8 @@ stages:
           buildType: 'current'
           artifactName: $(k8s-deployment)
           targetPath: $(System.DefaultWorkingDirectory)/$(k8sPathName)
+      - script: ls $(System.DefaultWorkingDirectory)
+        displayName: "Check folder $(System.DefaultWorkingDirectory)"
       - task: kubernetes@1
         displayName: "Apply Deployment YAML"
         inputs:
