@@ -35,12 +35,7 @@ stages:
     displayName: "Upload Deployment YAML"
     #dependsOn: Build
     steps:
-    - script: ls $(System.DefaultWorkingDirectory)
-      displayName: "Check folder $(System.DefaultWorkingDirectory)"
-    - script: ls $(Pipeline.Workspace)
-      displayName: "Check folder $(Pipeline.Workspace)"
-    - script: mkdir -p $(System.DefaultWorkingDirectory)/$(k8sPathName)
-      displayName: "Create artifact folder"
+
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: $(System.DefaultWorkingDirectory)/k8s.dev.yaml
@@ -68,4 +63,4 @@ stages:
           namespace: 'tc3'
           command: 'apply'
           useConfigurableFile: true
-          configuration: '$(System.DefaultWorkingDirectory)/$(k8sPathName)/k8s-dev.yaml'
+          configuration: '$(System.DefaultWorkingDirectory)/k8s-dev.yaml'
