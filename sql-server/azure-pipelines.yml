@@ -38,7 +38,7 @@ stages:
 
     - task: PublishPipelineArtifact@1
       inputs:
-        targetPath: $(System.DefaultWorkingDirectory)/k8s.dev.yaml
+        targetPath: $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
         artifact: $(k8s-deployment)
         publishLocation: 'pipeline'
 
@@ -55,8 +55,6 @@ stages:
           buildType: 'current'
           artifactName: $(k8s-deployment)
           targetPath: $(System.DefaultWorkingDirectory)/$(k8sPathName)
-      - script: ls $(System.DefaultWorkingDirectory)
-        displayName: "Check folder $(System.DefaultWorkingDirectory)"
       - task: kubernetes@1
         displayName: "Apply Deployment YAML"
         inputs:
@@ -64,4 +62,5 @@ stages:
           kubernetesServiceEndpoint: 'fiap-aks-service-conn'
           namespace: 'tc3'
           command: apply
-          arguments: -f $(System.DefaultWorkingDirectory)/k8s.dev.yaml
+          useConfigurableFile: true
+          configuration: $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
