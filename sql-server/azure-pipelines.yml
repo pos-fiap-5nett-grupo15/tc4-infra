@@ -27,13 +27,36 @@ variables:
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
+
+
 stages:
 - stage: Build
   displayName: Build and push stage
   jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: CmdLine@2
+      inputs:
+        script: |
+          echo Show ws files.
+          echo $(ls)
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          latest
+
   - job: UploadArtifact
     displayName: "Upload Deployment YAML"
-    #dependsOn: Build
+    dependsOn: Build
     steps:
 
     - task: PublishPipelineArtifact@1
@@ -49,12 +72,7 @@ stages:
     displayName: Deploy Sql Server to AKS
     steps:
       - script: ls $(System.DefaultWorkingDirectory)/sql-server
-        displayName: "Check folder $(System.DefaultWorkingDirectory)"
-      - task: DownloadPipelineArtifact@2
-        inputs:
-          buildType: 'current'
-          artifactName: $(k8s-deployment)
-          targetPath: $(System.DefaultWorkingDirectory)/$(k8sPathName)
+        displayName: "Check folder sql-server"
       - task: kubernetes@1
         displayName: "Apply Deployment YAML"
         inputs:
