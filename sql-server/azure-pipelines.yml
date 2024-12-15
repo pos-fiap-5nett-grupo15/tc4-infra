@@ -64,4 +64,4 @@ stages:
           kubernetesServiceEndpoint: 'fiap-aks-service-conn'
           namespace: 'tc3'
           command: apply
-          arguments: -f '$(System.DefaultWorkingDirectory)/k8s.dev.yaml'
+          arguments: -f $(System.DefaultWorkingDirectory)/k8s.dev.yaml
