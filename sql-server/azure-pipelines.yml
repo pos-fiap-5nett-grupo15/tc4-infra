@@ -22,6 +22,7 @@ variables:
   containerRegistry: 'fiaptech3acr.azurecr.io'
   dockerfilePath: 'sql-server/Dockerfile'
   k8s-deployment: 'k8s-deployment-yaml'
+  k8sPathName: 'k8s'
   tag: '$(Build.BuildId)'
 
   # Agent VM image name
@@ -56,11 +57,11 @@ stages:
     displayName: "Upload Deployment YAML"
     dependsOn: Build
     steps:
-    - script: mkdir -p $(System.DefaultWorkingDirectory)/k8s
-      displayName: "Create artefact folder"
+    - script: mkdir -p $(System.DefaultWorkingDirectory)/$(k8sPathName)
+      displayName: "Create artifact folder"
     - task: PublishPipelineArtifact@1
       inputs:
-        targetPath: $(System.DefaultWorkingDirectory)/k8s
+        targetPath: $(System.DefaultWorkingDirectory)/$(k8sPathName)
         artifact: $(k8s-deployment)
         publishLocation: 'pipeline'
 
@@ -74,15 +75,13 @@ stages:
         inputs:
           buildTypo: 'current'
           artifactName: $(k8s-deployment)
-          targetPath: $(System.DefaultWorkingDirectory)/k8s
+          targetPath: $(System.DefaultWorkingDirectory)/$(k8sPathName)
       - task: kubernetes@1
         displayName: "Apply Deployment YAML"
         inputs:
-          connectionType: 'Azure resource Manager'
-          azureSubscription: '7d56ed09-a476-4593-9fbf-0927c0c53f5e'
-          resourceGroup: fiap-tech3
-          kubernetesCluster: fiapaks
+          connectionType: 'Kubernetes Service Connection'
+          kubernetesServiceConnection: fiap-aks-service-conn
           namespace: tc3
           command: 'apply'
           useConfigurableFile: true
-          configuration: '$(System.DefaultWorkingDirectory)/k8s/k8s-dev.yaml'
+          configuration: '$(System.DefaultWorkingDirectory)/$($(k8sPathName)/k8s-dev.yaml'
