@@ -63,4 +63,5 @@ stages:
           namespace: 'tc3'
           command: 'apply'
           useConfigurableFile: true
+          configurationType: configuration
           configuration: '$(System.DefaultWorkingDirectory)/k8s.dev.yaml'
