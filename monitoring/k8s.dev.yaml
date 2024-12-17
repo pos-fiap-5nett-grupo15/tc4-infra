@@ -7,90 +7,153 @@ parameters:
   skuName: Standard_LRS
 allowVolumeExpansion: true
 ---
+# Prometheus: Persistent Value
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sql-server-pv
+  name: prometheus-pv
   namespace: tc3
 spec:
   capacity:
     storage: 10Gi
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   azureFile:
     secretName: tc3storage-secret
-    shareName: sql-server-fileshare
+    shareName: prometheus-fileshare
     readOnly: false
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: sql-server-pvc
+  name: prometheus-pvc
   namespace: tc3
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 10Gi
   storageClassName: azurefile
 ---
+# Grafana: Persistent Value
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: grafana-pv
+  namespace: tc3
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  azureFile:
+    secretName: tc3storage-secret
+    shareName: grafana-fileshare
+    readOnly: false
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-pvc
+  namespace: tc3
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: azurefile
+---
+# Prometheus: Service
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sql-server
+  name: prometheus
   namespace: tc3
   labels:
-    app: sql-server
+    app: prometheus
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: sql-server
+      app: prometheus
   template:
     metadata:
       labels:
-        app: sql-server
+        app: prometheus
     spec:
       containers:
-      - name: sql-server
-        image: fiaptech3acr.azurecr.io/sql-server-seed:latest
-        env:
-        - name: ACCEPT_EULA
-          valueFrom:
-            configMapKeyRef:
-              name: sql-server-config-map
-              key: ACCEPT_EULA
-        - name: MSSQL_SA_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: sql-server-secret
-              key: MSSQL_SA_PASSWORD
-        - name: SVC_PASS
-          valueFrom:
-            secretKeyRef:
-              name: sql-server-secret
-              key: SVC_PASS
+      - name: prometheus
+        image: prom/prometheus:v2.24.1
         ports:
-        - containerPort: 1433
+        - containerPort: 9090
         volumeMounts:
-        - name: sql-server-data
-          mountPath: /var/opt/mssql
+        - name: prometheus-data
+          mountPath: /prometheus
       volumes:
-      - name: sql-server-data
+      - name: prometheus-data
         persistentVolumeClaim:
-          claimName: sql-server-pvc
+          claimName: prometheus-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: sql-server-service
+  name: prometheus-service
   namespace: tc3
 spec:
   selector:
-    app: sql-server
+    app: prometheus
   ports:
     - protocol: TCP
-      port: 1433
-      targetPort: 1433
+      port: 9090
+      targetPort: 9090
+  type: LoadBalancer
+---
+# Grafana: Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: tc3
+  labels:
+    app: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:11.2.0
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: "admin"
+        volumeMounts:
+        - name: grafana-data
+          mountPath: /var/lib/grafana
+      volumes:
+      - name: grafana-data
+        persistentVolumeClaim:
+          claimName: grafana-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-service
+  namespace: tc3
+spec:
+  selector:
+    app: grafana
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
   type: LoadBalancer
