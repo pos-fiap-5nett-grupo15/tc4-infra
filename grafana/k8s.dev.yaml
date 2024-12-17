@@ -1,37 +1,40 @@
-# Prometheus: Service
+# Grafana: Service
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: prometheus
+  name: grafana
   namespace: tc3
   labels:
-    app: prometheus
+    app: grafana
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: prometheus
+      app: grafana
   template:
     metadata:
       labels:
-        app: prometheus
+        app: grafana
     spec:
       containers:
-      - name: prometheus
-        image: prom/prometheus:v2.24.1
+      - name: grafana
+        image: grafana/grafana:11.2.0
         ports:
-        - containerPort: 9090
+        - containerPort: 3000
+        env:
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: "admin"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: prometheus-service
+  name: grafana-service
   namespace: tc3
 spec:
   selector:
-    app: prometheus
+    app: grafana
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 9090
+      targetPort: 3000
   type: ClusterIP
