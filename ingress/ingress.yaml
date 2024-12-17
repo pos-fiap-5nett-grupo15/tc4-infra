@@ -15,21 +15,17 @@ spec:
               name: get-contacs-service
               port:
                 number: 80
-    - http:
-      paths:
-      - path: /metrics/getcontacts
-        pathType: Prefix
-        backend:
-          service:
-            name: get-contacs-service
-            port:
-              number: 80
-    - http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: prometheus-service
-            port:
-              number: 9090
+        - path: /metrics/getcontacts
+          pathType: Prefix
+          backend:
+            service:
+              name: get-contacs-service
+              port:
+                number: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: prometheus-service
+              port:
+                number: 80
