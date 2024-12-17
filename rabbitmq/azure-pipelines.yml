@@ -49,25 +49,30 @@ stages:
           $(tag)
           latest
 
+  - job: UploadArtifact
+    displayName: "Upload Deployment YAML"
+    dependsOn: Build
+    steps:
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: $(System.DefaultWorkingDirectory)/rabbitmq/k8s.dev.yaml
+        artifact: $(k8s-deployment)
+        publishLocation: 'pipeline'
+
 - stage: Deploy
-  displayName: 'Deploy RabbitMQ Container'
-  dependsOn: Build
+  displayName: Deploy Stage
   jobs:
-  - deployment: DeployRabbitMQ
-    displayName: 'Deploy RabbitMQ'
-    pool:
-      vmImage: 'ubuntu-latest'
-    environment: 'dev'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: Docker@2
-            displayName: 'Run RabbitMQ Container'
-            inputs:
-              containerRegistry: $(dockerRegistryServiceConnection)
-              command: 'run'
-              repository: $(imageRepository)
-              containerCommand: '-d -p 5672:5672 -p 15672:15672'
-              name: 'rabbitmq-container'
-              tags: $(tag)
+  - job: DeployDatabase
+    displayName: Deploy monitoring to AKS
+    steps:
+      - script: ls $(System.DefaultWorkingDirectory)/rabbitmq
+        displayName: "Check folder RabbitMQ"
+      - task: kubernetes@1
+        displayName: "Apply Deployment YAML"
+        inputs:
+          connectionType: 'Kubernetes Service Connection'
+          kubernetesServiceEndpoint: 'fiap-aks-service-conn'
+          namespace: 'tc3'
+          command: apply
+          arguments: -f $(System.DefaultWorkingDirectory)/rabbitmq/k8s.dev.yaml

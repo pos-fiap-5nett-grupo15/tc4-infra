@@ -18,8 +18,9 @@ spec:
     spec:
       containers:
       - name: rabbitmq
-        image: rabbitmq:3-management
+        image: fiaptech3acr.azurecr.io/rabbitmq:latest
         ports:
+        - containerPort: 5672
         - containerPort: 15672
 ---
 apiVersion: v1
@@ -34,4 +35,7 @@ spec:
     - protocol: TCP
       port: 5672
       targetPort: 5672
+    - protocol: TCP
+      port: 15672
+      targetPort: 15672
   type: ClusterIP
