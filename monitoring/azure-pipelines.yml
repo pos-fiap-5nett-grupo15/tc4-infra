@@ -93,7 +93,7 @@ stages:
   displayName: Deploy Stage
   jobs:
   - job: DeployDatabase
-    displayName: Deploy Sql Server to AKS
+    displayName: Deploy monitoring to AKS
     steps:
       - script: ls $(System.DefaultWorkingDirectory)/monitoring
         displayName: "Check folder monitoring"
