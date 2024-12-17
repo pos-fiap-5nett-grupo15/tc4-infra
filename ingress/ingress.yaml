@@ -43,3 +43,10 @@ spec:
               name: grafana-service
               port:
                 number: 80
+        - path: /DeleteContacts
+          pathType: Prefix
+          backend:
+            service:
+              name: delete-contacts-service
+              port:
+                number: 80
