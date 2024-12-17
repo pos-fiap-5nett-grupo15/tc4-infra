@@ -1,0 +1,73 @@
+
+trigger:
+  branches:
+    include:
+      - dev-rabbitmq
+
+  paths:
+    include:
+      - rabbitmq/*
+
+resources:
+- repo: self
+
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: '596527a0-844e-4fd1-af71-888334b640ff'
+  containerRegistry: 'fiaptech3acr.azurecr.io'
+  k8s-deployment: 'k8s-deployment-yaml'
+  k8sPathName: 'k8s'
+  tag: '$(Build.BuildId)'
+  vmImageName: 'ubuntu-latest'
+
+  # RabbitMQ
+  rabbitmqImageRepository: 'rabbitmq'
+  rabbitmqDockerfilePath: 'rabbitmq/Dockerfile'
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:
+  - job: Build
+    displayName: Build RabbitMQ
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: CmdLine@2
+      inputs:
+        script: |
+          echo Show ws files.
+          echo $(ls)
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(rabbitmqImageRepository)
+        dockerfile: $(rabbitmqDockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          latest
+
+- stage: Deploy
+  displayName: 'Deploy RabbitMQ Container'
+  dependsOn: Build
+  jobs:
+  - deployment: DeployRabbitMQ
+    displayName: 'Deploy RabbitMQ'
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'dev'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: Docker@2
+            displayName: 'Run RabbitMQ Container'
+            inputs:
+              containerRegistry: $(dockerRegistryServiceConnection)
+              command: 'run'
+              repository: $(imageRepository)
+              containerCommand: '-d -p 5672:5672 -p 15672:15672'
+              name: 'rabbitmq-container'
+              tags: $(tag)
