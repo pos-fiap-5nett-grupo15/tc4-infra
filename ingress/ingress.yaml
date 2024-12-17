@@ -36,3 +36,10 @@ spec:
               name: rabbitmq-service-management
               port:
                 number: 80
+        - path: /login
+          pathType: Prefix
+          backend:
+            service:
+              name: grafana-service
+              port:
+                number: 80
