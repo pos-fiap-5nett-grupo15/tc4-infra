@@ -1,0 +1,96 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: azurefile
+provisioner: file.csi.azure.com
+parameters:
+  skuName: Standard_LRS
+allowVolumeExpansion: true
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sql-server-pv
+  namespace: tc3
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  azureFile:
+    secretName: tc3storage-secret
+    shareName: sql-server-fileshare
+    readOnly: false
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sql-server-pvc
+  namespace: tc3
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: azurefile
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sql-server
+  namespace: tc3
+  labels:
+    app: sql-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sql-server
+  template:
+    metadata:
+      labels:
+        app: sql-server
+    spec:
+      containers:
+      - name: sql-server
+        image: fiaptech3acr.azurecr.io/sql-server-seed:latest
+        env:
+        - name: ACCEPT_EULA
+          valueFrom:
+            configMapKeyRef:
+              name: sql-server-config-map
+              key: ACCEPT_EULA
+        - name: MSSQL_SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sql-server-secret
+              key: MSSQL_SA_PASSWORD
+        - name: SVC_PASS
+          valueFrom:
+            secretKeyRef:
+              name: sql-server-secret
+              key: SVC_PASS
+        ports:
+        - containerPort: 1433
+        volumeMounts:
+        - name: sql-server-data
+          mountPath: /var/opt/mssql
+      volumes:
+      - name: sql-server-data
+        persistentVolumeClaim:
+          claimName: sql-server-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sql-server-service
+  namespace: tc3
+spec:
+  selector:
+    app: sql-server
+  ports:
+    - protocol: TCP
+      port: 1433
+      targetPort: 1433
+  type: LoadBalancer

@@ -3,7 +3,7 @@ services:
     image: prom/prometheus:v2.24.1
     container_name: prometheus
     volumes:
-     - ./prometheus/:/etc/prometheus/
+     - ./prometheus/settings/:/etc/prometheus/
     ports:
      - "9090:9090"
     networks:
@@ -15,9 +15,9 @@ services:
     depends_on:
       - prometheus
     volumes:
-      - ./grafana/dashboard_setup.json:/etc/grafana/provisioning/dashboards/imported-dashboards/dashboard.json
-      - ./prometheus/prometheus-datasource.yml:/etc/grafana/provisioning/datasources/prometheus-datasource.yml
-      - ./grafana/grafana-dashboard.yml:/etc/grafana/provisioning/dashboards/grafana-dashboard.yml
+      - ./grafana/settings/dashboard_setup.json:/etc/grafana/provisioning/dashboards/imported-dashboards/dashboard.json
+      - ./grafana/settings/prometheus-datasource.yml:/etc/grafana/provisioning/datasources/prometheus-datasource.yml
+      - ./grafana/settings/grafana-dashboard.yml:/etc/grafana/provisioning/dashboards/grafana-dashboard.yml
     ports:
      - "3000:3000"
     environment:
