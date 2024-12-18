@@ -3,9 +3,6 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: user-service
-    static_configs:
-      - targets: ['user-service']
   - job_name: get-service
     static_configs:
       - targets: ['get-contacts-service']
@@ -18,12 +15,3 @@ scrape_configs:
   - job_name: delete-service
     static_configs:
       - targets: ['delete-contacts-service']
-  - job_name: create-service-consumer
-    static_configs:
-      - targets: ['create-contact-worker-service']
-  - job_name: update-service-consumer
-    static_configs:
-      - targets: ['update-contact-worker-service']
-  - job_name: delete-service-consumer
-    static_configs:
-      - targets: ['delete-contact-worker-service']
