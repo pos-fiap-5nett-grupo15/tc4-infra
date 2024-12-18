@@ -57,3 +57,10 @@ spec:
               name: update-contacts-service
               port:
                 number: 80
+        - path: /CreateContacts
+          pathType: Prefix
+          backend:
+            service:
+              name: create-contacts-service
+              port:
+                number: 80
