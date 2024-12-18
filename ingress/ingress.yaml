@@ -12,14 +12,14 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: get-contacs-service
+              name: get-contacts-service
               port:
                 number: 80
         - path: /metrics/getcontacts
           pathType: Prefix
           backend:
             service:
-              name: get-contacs-service
+              name: get-contacts-service
               port:
                 number: 80
         - path: /classic
