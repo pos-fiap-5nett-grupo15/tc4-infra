@@ -50,3 +50,10 @@ spec:
               name: delete-contacts-service
               port:
                 number: 80
+        - path: /UpdateContacts
+          pathType: Prefix
+          backend:
+            service:
+              name: update-contacts-service
+              port:
+                number: 80

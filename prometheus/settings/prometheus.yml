@@ -8,22 +8,22 @@ scrape_configs:
       - targets: ['user-service']
   - job_name: get-service
     static_configs:
-      - targets: ['get-contacs-service']
+      - targets: ['get-contacts-service']
   - job_name: create-service
     static_configs:
-      - targets: ['create-contacs-service']
+      - targets: ['create-contacts-service']
   - job_name: update-service
     static_configs:
-      - targets: ['update-contacs-service']
+      - targets: ['update-contacts-service']
   - job_name: delete-service
     static_configs:
-      - targets: ['delete-contacs-service']
+      - targets: ['delete-contacts-service']
   - job_name: create-service-consumer
     static_configs:
-      - targets: ['create-contacs-service-consumer']
+      - targets: ['create-contact-worker-service']
   - job_name: update-service-consumer
     static_configs:
-      - targets: ['update-contacs-service-consumer']
+      - targets: ['update-contact-worker-service']
   - job_name: delete-service-consumer
     static_configs:
-      - targets: ['delete-contacs-service-consumer']
+      - targets: ['delete-contact-worker-service']
