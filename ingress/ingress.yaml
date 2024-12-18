@@ -29,18 +29,11 @@ spec:
               name: prometheus-service-management
               port:
                 number: 80
-        - path: /man
-          pathType: Prefix
-          backend:
-            service:
-              name: rabbitmq-service-management
-              port:
-                number: 80
         - path: /
           pathType: Prefix
           backend:
             service:
-              name: grafana-service
+              name: rabbitmq-service-management
               port:
                 number: 80
         - path: /contacts/create
@@ -54,6 +47,6 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: update-contacs-service
+              name: update-contacts-service
               port:
                 number: 80
