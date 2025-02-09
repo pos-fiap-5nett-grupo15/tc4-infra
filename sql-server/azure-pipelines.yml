@@ -76,12 +76,12 @@ stages:
     steps:
       - script: ls $(System.DefaultWorkingDirectory)/sql-server
         displayName: "Check folder sql-server"
-      - task: FileTransform@1
-        displayName: "Replace depolyment.yaml variables."
-        inputs:
-          folderPath: '$(System.DefaultWorkingDirectory)/sql-server'
-          fileType: 'yaml'
-          targetFiles: '**/k8s.dev.yaml'
+        
+      - script: |
+          sed -i 's/PLACEHOLDER_NAMESPACE/$(k8sNamespace)/g' $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
+          sed -i 's/PLACEHOLDER_CONTAINER_REGISTRY/$(containerRegistry)/g' $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
+        displayName: 'Replace variables in YAML'
+        
       - task: kubernetes@1
         displayName: "Apply Deployment YAML"
         inputs:
