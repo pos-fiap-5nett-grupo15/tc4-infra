@@ -26,6 +26,7 @@ variables:
   k8sPathName: 'k8s'
   tag: '$(Build.BuildId)'
   k8sNamespace: $(_k8sNamespace)
+  kubernetesServiceEndpoint: $(_kubernetesServiceEndpoint)
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -79,7 +80,7 @@ stages:
         displayName: "Apply Deployment YAML"
         inputs:
           connectionType: 'Kubernetes Service Connection'
-          kubernetesServiceEndpoint: 'fiap-aks-service-conn'
+          kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
           namespace: $(k8sNamespace)
           command: apply
           arguments: -f $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
