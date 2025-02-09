@@ -1,3 +1,4 @@
 *.hcl
 /dev/.terraform/
 *.tfstate
+*.tfstate.backup
