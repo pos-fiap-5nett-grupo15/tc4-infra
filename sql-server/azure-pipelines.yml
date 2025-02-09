@@ -6,6 +6,7 @@ trigger:
   branches:
     include:
       - dev
+      - feat/terraform
 
   paths:
     include:
@@ -17,13 +18,14 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '596527a0-844e-4fd1-af71-888334b640ff'
-  imageRepository: 'sql-server-seed'
-  containerRegistry: 'fiaptech3acr.azurecr.io'
-  dockerfilePath: 'sql-server/Dockerfile'
-  k8s-deployment: 'k8s-deployment-yaml'
+  dockerRegistryServiceConnection: $(_dockerRegistryServiceConnection)
+  imageRepository: $(_imageRepository)
+  containerRegistry: $(_containerRegistry)
+  dockerfilePath: $(_dockerfilePath)
+  k8s-deployment: $(_k8s-deployment)
   k8sPathName: 'k8s'
   tag: '$(Build.BuildId)'
+  k8sNamespace: $(_k8sNamespace)
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -78,6 +80,6 @@ stages:
         inputs:
           connectionType: 'Kubernetes Service Connection'
           kubernetesServiceEndpoint: 'fiap-aks-service-conn'
-          namespace: 'tc3'
+          namespace: $(k8sNamespace)
           command: apply
           arguments: -f $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
