@@ -76,6 +76,12 @@ stages:
     steps:
       - script: ls $(System.DefaultWorkingDirectory)/sql-server
         displayName: "Check folder sql-server"
+      - task: FileTransform@1
+        description: "Replace depoyment.yaml variables."
+        inputs:
+          folderPath: '$(System.DefaultWorkingDirectory)/sql-server'
+          fileType: 'yaml'
+          targetFiles: '**/k8s.dev.yaml'
       - task: kubernetes@1
         displayName: "Apply Deployment YAML"
         inputs:
