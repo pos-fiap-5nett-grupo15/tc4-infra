@@ -52,7 +52,7 @@ stages:
         command: buildAndPush
         repository: $(imageRepository)
         dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
+        containerRegistry: fiap-acr-service-conn
         tags: |
           $(tag)
           latest
@@ -86,7 +86,7 @@ stages:
         displayName: "Apply Deployment YAML"
         inputs:
           connectionType: 'Kubernetes Service Connection'
-          kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
+          kubernetesServiceEndpoint: fiap-aks-service-conn
           namespace: $(k8sNamespace)
           command: apply
           arguments: -f $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
