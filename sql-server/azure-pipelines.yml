@@ -76,10 +76,12 @@ stages:
     steps:
       - script: ls $(System.DefaultWorkingDirectory)/sql-server
         displayName: "Check folder sql-server"
-        
+
       - script: |
+          cat $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
           sed -i 's/PLACEHOLDER_NAMESPACE/$(k8sNamespace)/g' $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
           sed -i 's/PLACEHOLDER_CONTAINER_REGISTRY/$(containerRegistry)/g' $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
+          cat $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
         displayName: 'Replace variables in YAML'
         
       - task: kubernetes@1
