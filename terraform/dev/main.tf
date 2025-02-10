@@ -4,8 +4,17 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.18.0"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "2.35.1"
+    }
   }
   required_version = ">=1.1.0"
+}
+
+
+provider "kubernetes" {
+  config_path = "~/.kube/config" # Caminho para o arquivo kubeconfig
 }
 
 provider "azurerm" {
@@ -44,4 +53,32 @@ resource "azurerm_role_assignment" "acr_pull" {
   principal_id         = module.aks.kubelet_identity_object_id
   role_definition_name = "AcrPull"
   scope                = module.acr.acr_id
+}
+
+module "storage" {
+  source                   = "../modules/azure_storage"
+  storage_account_name     = var.storage_account_name
+  resource_group_name      = module.resource_group.resource_group_name
+  resource_group_location  = module.resource_group.resource_group_location
+  account_tier             = "Standard"
+  access_tier              = "Cool"
+  account_replication_type = "LRS"
+  storage_share_name       = var.storage_share_name
+}
+
+module "sql_server_config_map" {
+  source    = "../modules/configmap"
+  name      = "sql-server-config-map"
+  namespace = var.kube_namespace
+  data = {
+    ACCEPT_EULA = "Y"
+  }
+}
+
+module "sql_server_secret" {
+  source            = "../modules/secrets"
+  name              = "sql-server-secret"
+  namespace         = var.kube_namespace
+  mssql_sa_password = var.mssql_sa_password
+  svc_pass          = var.svc_pass
 }

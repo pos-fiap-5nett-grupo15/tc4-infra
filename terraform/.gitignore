@@ -2,3 +2,6 @@
 /dev/.terraform/
 *.tfstate
 *.tfstate.backup
+
+/dev/terraform.tfvars
+*.tfstate.lock.info
