@@ -5,7 +5,7 @@ resource "kubernetes_secret" "this" {
   }
 
   data = {
-    MSSQL_SA_PASSWORD = base64encode(var.mssql_sa_password)
+    MSSQL_SA_PASSWORD = var.mssql_sa_password
     SVC_PASS          = base64encode(var.svc_pass)
   }
 }

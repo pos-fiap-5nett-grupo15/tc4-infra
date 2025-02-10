@@ -12,10 +12,3 @@ output "resource_group_name" {
 #   description = "The login server of the Azure Container Registry"
 #   value       = module.acr.acr_login_server
 # }
-output "storage_account_name" {
-  value = module.storage.storage_account_name
-}
-
-output "storage_share_name" {
-  value = module.storage.storage_share_name
-}

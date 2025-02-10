@@ -22,7 +22,7 @@ variable "dns_prefix" {
 variable "node_count" {
   description = "O número de nós no pool padrão."
   type        = number
-  default     = 3
+  default     = 1
 }
 
 variable "vm_size" {
