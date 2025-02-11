@@ -1,11 +1,53 @@
-Roteiro de configuração da infra
+# Roteiro de configuração da infra
+
+1. Rodar os comandos de terraform na pasta ``./terraform/dev/core`` 
+Os comando são:
+
+```shell
+terraform fmt
+terraform init
+terraform validate
+terraform plan
+terraform apply
+```
+
+2. Criar alguns recursos via azure cli.
+Os comando são os seguintes:
+  1. Com o cluster recem criado é necessário baixar novamente as credenciais para usar o kubectl.
+
+```shell
+    az aks get-credentials --resource-group fiap-tech-4 --name fiapaks --overwrite-existing
+```
+
+  2. Criar o namespace no cluster. **(Obs: talvez seja possível criar este usando o terraform)**
+
+```shell
+    kubectl create namespace tc4
+```
+
+3. Rodar o segundo terraform que está no folder ``./terraform/dev/kube-config``. Os comando são os mesmos do passo 1.
+
+4. Criar a secret do azure storage no cluster. Esta pode ser feita usando o seguinte comando:
+
+```shell
+az storage account keys list --resource-group fiap-tech-4 --account-name fiaptc4storage --query '[0].value' --output tsv | xargs -I '{}' kubectl create secret generic tc4storage-secret \
+--from-literal=azurestorageaccountname=fiaptc4storage \
+--from-literal=azurestorageaccountkey='{}' -n tc4
+```
+
+5. Por último é necessario recriar as services connections no azure devops, para que o pipeline tenha acesso ao ACR e ao AKS.
+
+[link para página](https://dev.azure.com/caiomaiavms-fiap/tech-challenge-4/_settings/adminservices)
+
+
+## Rascunho
 
 Terraform apply
 
 ### Update Cluster Credentials
-az aks get-credentials --resource-group fiap-tech-4 --name fiapaks --overwrite-existing
 
-kubectl create namespace tc4
+
+
 
 criar service connection para o kubernetes e para o docker
 
@@ -14,7 +56,7 @@ Deploy dos demais itens
 az storage account keys list --resource-group fiap-tech-4 --account-name tc3storage --query '[0].value' --output tsv
 
 
-az storage account keys list --resource-group fiap-tech-4 --account-name fiaptc4storage --query '[0].value' --output tsv | xargs -I '{}' kubectl create secret generic tc3storage-secret \
+az storage account keys list --resource-group fiap-tech-4 --account-name fiaptc4storage --query '[0].value' --output tsv | xargs -I '{}' kubectl create secret generic tc4storage-secret \
 --from-literal=azurestorageaccountname=fiaptc4storage \
 --from-literal=azurestorageaccountkey='{}' -n tc4
 
@@ -28,12 +70,10 @@ kubectl create configmap my-config --from-literal=ENV_VAR_NAME=value --from-lite
 kubectl create configmap sql-server-config-map --from-literal=ACCEPT_EULA=Y -n tc4
 
 kubectl create secret generic sql-server-secret \
-  --from-literal=MSSQL_SA_PASSWORD=Q1w2e3r4 \
-  --from-literal=SVC_PASS=Q1w2e3r4 \
+  --from-literal=MSSQL_SA_PASSWORD=senha \
+  --from-literal=SVC_PASS=senha \
   -n tc4
 ```
-
-
 
 
 az storage account create \

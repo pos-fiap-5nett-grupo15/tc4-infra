@@ -52,7 +52,7 @@ module "aks" {
   tags                = { "env" = "dev" }
   subscription_id     = var.subscription_id
   node_count          = 1
-  vm_size             = "Standard_D2pls_v6"
+  vm_size             = "Standard_D2als_v6"
 }
 
 resource "azurerm_role_assignment" "acr_pull" {
