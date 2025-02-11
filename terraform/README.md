@@ -40,6 +40,18 @@ az storage account keys list --resource-group fiap-tech-4 --account-name fiaptc4
 [link para página](https://dev.azure.com/caiomaiavms-fiap/tech-challenge-4/_settings/adminservices)
 
 
+6. Existe um arquivo chamado ``terraform.tfvars`` onde estão escritas as credenciais que serão utilizadas no banco.
+
+```tfvars
+#Conteúdo do ./terraform/dev/kube-config/terraform.tfvars
+
+mssql_sa_password = "senha_root"
+svc_pass          = "senha_service"
+
+```
+
+
+
 ## Rascunho
 
 Terraform apply
