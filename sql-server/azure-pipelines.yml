@@ -17,13 +17,15 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '596527a0-844e-4fd1-af71-888334b640ff'
-  imageRepository: 'sql-server-seed'
-  containerRegistry: 'fiaptech3acr.azurecr.io'
-  dockerfilePath: 'sql-server/Dockerfile'
-  k8s-deployment: 'k8s-deployment-yaml'
+  dockerRegistryServiceConnection: $(_dockerRegistryServiceConnection)
+  imageRepository: $(_imageRepository)
+  containerRegistry: $(_containerRegistry)
+  dockerfilePath: $(_dockerfilePath)
+  k8s-deployment: $(_k8s-deployment)
   k8sPathName: 'k8s'
   tag: '$(Build.BuildId)'
+  k8sNamespace: $(_k8sNamespace)
+  kubernetesServiceEndpoint: $(_kubernetesServiceEndpoint)
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -49,7 +51,7 @@ stages:
         command: buildAndPush
         repository: $(imageRepository)
         dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
+        containerRegistry: fiap-acr-service-conn
         tags: |
           $(tag)
           latest
@@ -73,11 +75,20 @@ stages:
     steps:
       - script: ls $(System.DefaultWorkingDirectory)/sql-server
         displayName: "Check folder sql-server"
+
+      - script: |
+          cat $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
+          sed -i 's/PLACEHOLDER_NAMESPACE/$(k8sNamespace)/g' $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
+          sed -i 's/PLACEHOLDER_CONTAINER_REGISTRY/$(containerRegistry)/g' $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
+          cat $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
+        displayName: 'Replace variables in YAML'
+      - script: cat $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
+        displayName: Show k8s.dev.yaml
       - task: kubernetes@1
         displayName: "Apply Deployment YAML"
         inputs:
           connectionType: 'Kubernetes Service Connection'
-          kubernetesServiceEndpoint: 'fiap-aks-service-conn'
-          namespace: 'tc3'
+          kubernetesServiceEndpoint: fiap-aks-service-conn
+          namespace: $(k8sNamespace)
           command: apply
           arguments: -f $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
