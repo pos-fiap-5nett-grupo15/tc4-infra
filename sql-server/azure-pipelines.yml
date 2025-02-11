@@ -6,7 +6,6 @@ trigger:
   branches:
     include:
       - dev
-      - feat/terraform
 
   paths:
     include:
