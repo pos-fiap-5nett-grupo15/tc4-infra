@@ -1,5 +1,6 @@
 # Roteiro de configuração da infra
 
+## Criação
 1. Rodar os comandos de terraform na pasta ``./terraform/dev/core`` 
 Os comando são:
 
@@ -50,6 +51,21 @@ svc_pass          = "senha_service"
 
 ```
 
+## Destruição
+
+
+1. Rodar os comandos de terraform na pasta ``./terraform/dev/kube-config``.
+Os comando são:
+
+```shell
+terraform destroy
+```
+
+2. Rodar os comandos de terraform na pasta  ``./terraform/dev/core`` 
+Os comando são:
+```shell
+terraform destroy
+```
 
 
 ## Rascunho
