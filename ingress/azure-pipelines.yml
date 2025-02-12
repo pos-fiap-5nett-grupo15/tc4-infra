@@ -47,7 +47,7 @@ stages:
         displayName: "Check folder ingress"
 
       - script: |
-          sed -i 's/PLACEHOLDER_NAMESPACE/$(k8sNamespace)/g' $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
+          sed -i 's/PLACEHOLDER_NAMESPACE/$(k8sNamespace)/g' $(System.DefaultWorkingDirectory)/ingress/ingress.yaml
         displayName: 'Replace variables in YAML'
 
       - task: kubernetes@1
