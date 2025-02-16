@@ -20,7 +20,7 @@ variables:
   dockerRegistryServiceConnection: $(_dockerRegistryServiceConnection)
   containerRegistry: $(_containerRegistry)
   k8s-deployment: $(_k8s-deployment)
-  k8sPathName: 'k8s'
+  k8sPathName: 'k8s/grafana/k8s.dev.yaml'
   kubernetesServiceEndpoint: $(_kubernetesServiceEndpoint)
   kubernetesNamespace: $(_k8sNamespace)
   tag: '$(Build.BuildId)'
@@ -87,4 +87,4 @@ stages:
           kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
           namespace: $(kubernetesNamespace)
           command: apply
-          arguments: -f $(System.DefaultWorkingDirectory)/grafana/k8s.dev.yaml
+          arguments: -f $(System.DefaultWorkingDirectory)/$(k8sPathName)
