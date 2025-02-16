@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grafana
-  namespace: tc3
+  namespace: PLACEHOLDER_NAMESPACE
   labels:
     app: grafana
 spec:
@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: grafana
-        image: fiaptech3acr.azurecr.io/grafana:latest
+        image: PLACEHOLDER_CONTAINER_REGISTRY/PLACEHOLDER_IMAGE_REPOSITORY:latest
         ports:
         - containerPort: 3000
         env:
@@ -29,7 +29,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: grafana-service
-  namespace: tc3
+  namespace: PLACEHOLDER_NAMESPACE
 spec:
   selector:
     app: grafana
