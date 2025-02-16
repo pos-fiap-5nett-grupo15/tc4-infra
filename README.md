@@ -1,60 +1,59 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+# Como Subir a Infra
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+1. Subir Fluxo [Terraform](./terraform/README.md)
+2. Executar os [Pipelines](https://dev.azure.com/caiomaiavms-fiap/tech-challenge-4/_build)
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+## Subida do Banco de dados
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
-
-
-# Criando um FileStorage para o SQL Server
+Execute o [Pipeline de SQL](https://dev.azure.com/caiomaiavms-fiap/tech-challenge-4/_build?definitionId=21) para a branch de dev. Este pipeline buildar a imagem do banco sql server e realizar o deploy no cluster.
+Em seguida pegue o IP que foi atribuido ao load balancer do banco de dados e teste a conexão, usando as crecenciais que serão utilizadas na aplicação.
+Para  pegar o ip do banco de dados basta executar o seguinte comando:
 
 ```shell
-az storage account create \
-    --resource-group fiap-tech3 \
-    --name tc3storage \
-    --location eastus \
-    --sku Standard_LRS \
-    --tags env=dev \
-    --access-tier Cool
-
-az storage account keys list --resource-group fiap-tech3 --account-name tc3storage --query '[0].value' --output tsv
-
-az storage share create --name sql-server-fileshare --account-name tc3storage
+kubectl get svc -n tc4 -o jsonpath='{.items[?(@.metadata.name=="sql-server-service")].status.loadBalancer.ingress[0].ip}' |  xargs -I '{}'  echo External IP: '{}'
 ```
+ ## Subida das Aplicações
 
-Agora é necessário criar um secret para receber os dados de autenticação no storage. Uma das formas de fazer isto é utilizar o seguinte comando
-```shell
-kubectl create secret generic tc3storage-secret \
-  --from-literal=azurestorageaccountname=tc3storage \
-  --from-literal=azurestorageaccountkey=mKJ8hugH6U1XxstgSYQeylt1eRX1ZzQ6yw1wevXYj+OENfokWlHkuBfz6UdX3QV5BIisPpfjegCy+ASt6vLnvw== \
-  -n tc3
-```
+### Troca de Conection String
 
-para passar as variáveis de ambiente podemos usar o configmap e secrets
+Como o IP do banco de dados foi alterado, será necessário a conection string nas aplicações .net. Como esta conection string é criptografada, será necessario criprografá-la utlizando o Crypo.Test na solution do tech challenge 3.
+
+
+### tc4-get-contacts-api
+
+Para subir esta api basta apenas executa o seu [pipeline](https://dev.azure.com/caiomaiavms-fiap/tech-challenge-4/_build?definitionId=29)
+Uma vez finalizado o deply, basta verificar se o pod está rodando. Isto pode ser feito usando o comando
 
 ```shell
-kubectl create configmap my-config --from-literal=ENV_VAR_NAME=value --from-literal=ANOTHER_VAR=another_value -n custom namespace
-
-kubectl create configmap sql-server-config-map --from-literal=ACCEPT_EULA=Y -n tc3
-
-kubectl create secret generic sql-server-secret \
-  --from-literal=MSSQL_SA_PASSWORD=Q1w2e3r4 \
-  --from-literal=SVC_PASS=Q1w2e3r4 \
-  -n tc3
+kubectl get pods -n tc4 | grep get-contacts #Este
 ```
 
-Agora basta usar estas configuraçõesno yaml.
+
+## Subida do Ingress
+
+### Configuração.
+
+O primeiro passo é instalar um ingress nginx no nosso cluster. O ingress escolhido foi o [Ingress NGINX Controller](https://github.com/kubernetes/ingress-nginx).
+Para instalar este ingress basta executar o seguinte comando:
+
+
+```shell
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+```
+ 
+Para testar o funcionamento da configuraçào do ingress basta utlizar o comando
+
+
+```shell
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=120s
+```
+
+
+
+# Notas
+
+
