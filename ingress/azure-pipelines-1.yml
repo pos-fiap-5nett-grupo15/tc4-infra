@@ -1,0 +1,55 @@
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+  branches:
+    include:
+      - main
+
+  paths:
+    include:
+      - ingress/*
+
+
+resources:
+- repo: self
+
+variables:
+  # Container registry service connection established during pipeline creation
+  k8s-deployment: 'k8s-services-yaml'
+  tag: '$(Build.BuildId)'
+
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:
+  - job: UploadArtifact
+    displayName: "Upload Deployment YAML"
+    steps:
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: $(System.DefaultWorkingDirectory)/ingress/ingress.yaml
+        artifact: $(k8s-deployment)
+        publishLocation: 'pipeline'
+
+- stage: Deploy
+  displayName: Deploy Stage
+  jobs:
+  - job: DeployDatabase
+    displayName: Deploy Sql Server to AKS
+    steps:
+      - script: ls $(System.DefaultWorkingDirectory)/ingress
+        displayName: "Check folder ingress"
+      - task: kubernetes@1
+        displayName: "Apply Deployment YAML"
+        inputs:
+          connectionType: 'Kubernetes Service Connection'
+          kubernetesServiceEndpoint: 'fiap-aks-service-conn'
+          namespace: 'tc3'
+          command: apply
+          arguments: -f $(System.DefaultWorkingDirectory)/ingress/ingress.yaml

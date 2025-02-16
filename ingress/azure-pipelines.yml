@@ -1,0 +1,60 @@
+
+trigger:
+  branches:
+    include:
+      - dev
+      - feat/ingress
+
+  paths:
+    include:
+      - ingress/*
+
+
+resources:
+- repo: self
+
+variables:
+  # Container registry service connection established during pipeline creation
+  k8s-deployment: $(_k8s-deployment)
+  k8sNamespace: $(_k8sNamespace)
+  kubernetesServiceEndpoint: $(_kubernetesServiceEndpoint)
+  tag: '$(Build.BuildId)'
+
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:
+  - job: UploadArtifact
+    displayName: "Upload Deployment YAML"
+    steps:
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: $(System.DefaultWorkingDirectory)/ingress/ingress.yaml
+        artifact: $(k8s-deployment)
+        publishLocation: 'pipeline'
+
+- stage: Deploy
+  displayName: Deploy Stage
+  jobs:
+  - job: DeployDatabase
+    displayName: Deploy Ingress to AKS
+    steps:
+      - script: ls $(System.DefaultWorkingDirectory)/ingress
+        displayName: "Check folder ingress"
+
+      - script: |
+          sed -i 's/PLACEHOLDER_NAMESPACE/$(k8sNamespace)/g' $(System.DefaultWorkingDirectory)/ingress/ingress.yaml
+        displayName: 'Replace variables in YAML'
+
+      - task: kubernetes@1
+        displayName: "Apply Deployment YAML"
+        inputs:
+          connectionType: 'Kubernetes Service Connection'
+          kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
+          namespace: $(k8sNamespace)
+          command: apply
+          arguments: -f $(System.DefaultWorkingDirectory)/ingress/ingress.yaml

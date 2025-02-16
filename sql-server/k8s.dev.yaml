@@ -11,14 +11,14 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: sql-server-pv
-  namespace: tc3
+  namespace: PLACEHOLDER_NAMESPACE
 spec:
   capacity:
     storage: 10Gi
   accessModes:
     - ReadWriteMany
   azureFile:
-    secretName: tc3storage-secret
+    secretName: tc4storage-secret
     shareName: sql-server-fileshare
     readOnly: false
 ---
@@ -26,7 +26,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: sql-server-pvc
-  namespace: tc3
+  namespace: PLACEHOLDER_NAMESPACE
 spec:
   accessModes:
     - ReadWriteMany
@@ -39,7 +39,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sql-server
-  namespace: tc3
+  namespace: PLACEHOLDER_NAMESPACE
   labels:
     app: sql-server
 spec:
@@ -54,7 +54,7 @@ spec:
     spec:
       containers:
       - name: sql-server
-        image: fiaptech3acr.azurecr.io/sql-server-seed:latest
+        image: PLACEHOLDER_CONTAINER_REGISTRY/sql-server-seed:latest
         env:
         - name: ACCEPT_EULA
           valueFrom:
@@ -85,7 +85,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sql-server-service
-  namespace: tc3
+  namespace: PLACEHOLDER_NAMESPACE
 spec:
   selector:
     app: sql-server
