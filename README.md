@@ -28,6 +28,14 @@ Uma vez finalizado o deply, basta verificar se o pod está rodando. Isto pode se
 ```shell
 kubectl get pods -n tc4 | grep get-contacts #Este
 ```
+#### Testes da API
+
+1. Requisição Simples
+  **Dependências**: Ingress rodando. (Configurado nos passos abaixo.)
+  **Teste**
+``` shell
+kubectl get ingress -n tc4 -o jsonpath='{.items[?(@.metadata.name=="services-ingress")].status.loadBalancer.ingress[0].ip}' | |  xargs -I '{}'  curl -v http://'{}'/GetContacts/3
+```
 
 
 ## Subida do Ingress
@@ -52,8 +60,18 @@ kubectl wait --namespace ingress-nginx \
   --timeout=120s
 ```
 
+### Rodar Pipelines
+
+Agora basta rodar o pipeline da configuração [ingress](https://dev.azure.com/caiomaiavms-fiap/tech-challenge-4/_build?definitionId=30).
+Para testar a criação do ingress basta executar o comando
+
+```shell
+kubectl get ingress -n tc4 | grep services-ingress
+```
 
 
+
+      
 # Notas
 
 
