@@ -1159,6 +1159,6 @@ CREATE TABLE ContactsManagement.ApiUser (
 GO
 
 INSERT INTO ContactsManagement.UserType(Description) VALUES('Common');
-INSERT,NULL,1 INTO ContactsManagement.UserType(Description) VALUES('Administrator');
+INSERT INTO ContactsManagement.UserType(Description) VALUES('Administrator');
 INSERT INTO ContactsManagement.ApiUser (Username, Password, UserType) VALUES('Admin', 'AQAAAAIAAYagAAAAEAhqL3a26EnFvTX/QOCvf3r1Ni1yqCSzm7WXV2qgWdGivHohZJVeJj857UHaQJ/otQ==', 2);
 INSERT INTO ContactsManagement.ApiUser (Username, Password, UserType) VALUES('User', 'AQAAAAIAAYagAAAAEO5Av+AjYV5oMcMvglugM5K/yXPuH6Kx5A2D2rcgzbUDO1V23gciSOk5hvK48cbjdg==', 1);
