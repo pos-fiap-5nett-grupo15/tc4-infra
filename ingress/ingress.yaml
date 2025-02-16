@@ -15,3 +15,59 @@ spec:
               name: get-contacts-service
               port:
                 number: 80
+        - path: /metrics/getcontacts
+          pathType: Prefix
+          backend:
+            service:
+              name: get-contacts-service
+              port:
+                number: 80
+        - path: /classic
+          pathType: Prefix
+          backend:
+            service:
+              name: prometheus-service-management
+              port:
+                number: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: rabbitmq-service-management
+              port:
+                number: 80
+        - path: /contacts/create
+          pathType: Prefix
+          backend:
+            service:
+              name: create-contacs-service
+              port:
+                number: 80 
+        - path: /contacts/update
+          pathType: Prefix
+          backend:
+            service:
+              name: update-contacts-service
+              port:
+                number: 80
+        - path: /DeleteContacts
+          pathType: Prefix
+          backend:
+            service:
+              name: delete-contacts-service
+              port:
+                number: 80
+        - path: /UpdateContacts
+          pathType: Prefix
+          backend:
+            service:
+              name: update-contacts-service
+              port:
+                number: 80
+        - path: /CreateContacts
+          pathType: Prefix
+          backend:
+            service:
+              name: create-contacts-service
+              port:
+                number: 80
