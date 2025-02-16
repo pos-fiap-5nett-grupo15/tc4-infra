@@ -40,7 +40,7 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: create-contacs-service
+              name: create-contacts-service
               port:
                 number: 80 
         - path: /contacts/update

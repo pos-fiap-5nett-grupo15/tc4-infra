@@ -88,7 +88,7 @@ stages:
         displayName: "Apply Deployment YAML"
         inputs:
           connectionType: 'Kubernetes Service Connection'
-          kubernetesServiceEndpoint: fiap-aks-service-conn
+          kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
           namespace: $(k8sNamespace)
           command: apply
           arguments: -f $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
