@@ -38,6 +38,24 @@ kubectl get ingress -n tc4 -o jsonpath='{.items[?(@.metadata.name=="services-ing
 ```
 
 
+### tc4-update-contacts-api
+
+Para subir esta api basta apenas executa o seu [pipeline](https://dev.azure.com/caiomaiavms-fiap/tech-challenge-4/_build?definitionId=27)
+Uma vez finalizado o deply, basta verificar se o pod está rodando. Isto pode ser feito usando o comando
+
+```shell
+kubectl get pods -n tc4 | grep update-contacts #Este
+```
+#### Testes da API
+
+1. Requisição Simples
+  **Dependências**: Ingress rodando. (Configurado nos passos abaixo.)
+  **Teste**
+``` shell
+kubectl get ingress -n tc4 -o jsonpath='{.items[?(@.metadata.name=="services-ingress")].status.loadBalancer.ingress[0].ip}' | xargs -I '{}' curl -X PATCH -v http://'{}'/UpdateContacts/1 -H "Content-Type: application/json" -d "{\"nome\":\"string\",\"email\":\"teste123\",\"ddd\":0,\"telefone\":0}"
+```
+
+
 ## Subida do Ingress
 
 ### Configuração.
@@ -70,8 +88,140 @@ kubectl get ingress -n tc4 | grep services-ingress
 ```
 
 
+## Subida do Monitoramento
 
-      
+Como subir as aplicações de monitoramento(prometheus) e visualização(grafana)
+
+
+### Prometheus
+
+Para subir esta api basta apenas executa o seu [pipeline](https://dev.azure.com/caiomaiavms-fiap/tech-challenge-4/_build?definitionId=33)
+Uma vez finalizado o deply, basta verificar se o pod está rodando. Isto pode ser feito usando o comando
+
+```shell
+kubectl get pods -n tc4 | grep prometheus #Este
+```
+
+**IMPORTANTE:** Caso seja a primeira configuração, é necessário realizar a configuração abaixo
+
+
+#### Incluindo dependência(imagem base do Prometheus - Docker Hub)
+
+Caso seja a primera configuração do serviço, é necessário adicionar a imagem base do prometheus(docker-hub) no repositório privado(acr), com os seguintes passos:
+
+1. Fazer login no ACR
+  **Dependências:** Registry criado e permissão para logar/acessar
+```shell
+az acr login --name meuRegistry
+#Troque o meuRegistry pelo nome do registry de destino
+```
+
+2. Puxar a imagem do Prometheus do docker Hub
+```shell
+docker pull prom/prometheus:v2.24.1
+```
+
+3. Definir tag para a imagem no ACR
+```shell
+docker tag prom/prometheus:v2.24.1 meuRegistry.azurecr.io/prom/prometheus:v2.24.1
+#Troque o meuRegistry pelo nome do registry de destino
+```
+
+4. Enviar imagem para o ACR
+```shell
+docker push meuRegistry.azurecr.io/prom/prometheus:v2.24.1
+#Troque o meuRegistry pelo nome do registry de destino
+```
+
+5. Verificar imagem no ACR
+```shell
+az acr repository list --name meuRegistry --output table
+#Troque o meuRegistry pelo nome do registry de destino
+```
+
+
+#### Testes do serviço
+
+1. Requisição
+  **Dependências**: Ingress rodando. (Configurado nos passos acima.)
+  **Teste**
+``` shell
+kubectl get ingress -n tc4 -o jsonpath='{.items[?(@.metadata.name=="services-ingress")].status.loadBalancer.ingress[0].ip}' | xargs -I '{}' curl -X GET http://'{}'/classic/targets
+```
+
+2. Acesso via navegador
+  **Dependências**: Ingress rodando. (Configurado nos passos acima.)
+  **Captura da url de requisição**
+```shel
+kubectl get ingress -n tc4 -o jsonpath='{.items[?(@.metadata.name=="services-ingress")].status.loadBalancer.ingress[0].ip}' | xargs -I '{}' echo '{}'
+```
+  **Acessar:** http://URL_CAPTURADA/classic
+
+### Grafana
+
+Para subir esta api basta apenas executa o seu [pipeline](https://dev.azure.com/caiomaiavms-fiap/tech-challenge-4/_build?definitionId=22)
+Uma vez finalizado o deply, basta verificar se o pod está rodando. Isto pode ser feito usando o comando
+
+```shell
+kubectl get pods -n tc4 | grep grafana #Este
+```
+
+**IMPORTANTE:** Caso seja a primeira configuração, é necessário realizar a configuração abaixo
+
+
+#### Incluindo dependência(imagem base do Grafana - Docker Hub)
+
+Caso seja a primera configuração do serviço, é necessário adicionar a imagem base do grafana(docker-hub) no repositório privado(acr), com os seguintes passos:
+
+1. Fazer login no ACR
+  **Dependências:** Registry criado e permissão para logar/acessar
+```shell
+az acr login --name meuRegistry
+#Troque o meuRegistry pelo nome do registry de destino
+```
+
+2. Puxar a imagem do Prometheus do docker Hub
+```shell
+docker pull grafana/grafana:11.2.0
+```
+
+3. Definir tag para a imagem no ACR
+```shell
+docker tag grafana/grafana:11.2.0 meuRegistry.azurecr.io/grafana/grafana:11.2.0
+#Troque o meuRegistry pelo nome do registry de destino
+```
+
+4. Enviar imagem para o ACR
+```shell
+docker push meuRegistry.azurecr.io/grafana/grafana:11.2.0
+#Troque o meuRegistry pelo nome do registry de destino
+```
+
+5. Verificar imagem no ACR
+```shell
+az acr repository list --name meuRegistry --output table
+#Troque o meuRegistry pelo nome do registry de destino
+```
+
+
+#### Testes do serviço
+
+1. Requisição
+  **Dependências**: Ingress rodando. (Configurado nos passos acima.)
+  **Teste**
+``` shell
+kubectl get ingress -n tc4 -o jsonpath='{.items[?(@.metadata.name=="services-ingress")].status.loadBalancer.ingress[0].ip}' | xargs -I '{}' curl -X GET http://'{}'/
+```
+
+2. Acesso via navegador
+  **Dependências**: Ingress rodando. (Configurado nos passos acima.)
+  **Captura da url de acesso no navegador**
+```shel
+kubectl get ingress -n tc4 -o jsonpath='{.items[?(@.metadata.name=="services-ingress")].status.loadBalancer.ingress[0].ip}' | xargs -I '{}' echo '{}'
+```
+  **Acessar:** http://URL_CAPTURADA/
+
+
 # Notas
 
 
