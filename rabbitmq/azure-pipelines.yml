@@ -13,9 +13,9 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '596527a0-844e-4fd1-af71-888334b640ff'
-  containerRegistry: 'fiaptech3acr.azurecr.io'
-  k8s-deployment: 'k8s-deployment-yaml'
+  dockerRegistryServiceConnection: $(_dockerRegistryServiceConnection)
+  containerRegistry: $(_containerRegistry)
+  k8s-deployment: $(_k8s-deployment)
   k8sPathName: 'k8s'
   tag: '$(Build.BuildId)'
   vmImageName: 'ubuntu-latest'
@@ -68,6 +68,13 @@ stages:
     steps:
       - script: ls $(System.DefaultWorkingDirectory)/rabbitmq
         displayName: "Check folder RabbitMQ"
+      - script: |
+          cat $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
+          sed -i 's/PLACEHOLDER_NAMESPACE/$(kubernetesNamespace)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
+          sed -i 's/PLACEHOLDER_CONTAINER_REGISTRY/$(containerRegistry)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
+          sed -i 's/PLACEHOLDER_IMAGE_REPOSITORY/$(imageRepository)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
+          sed -i 's/PLACEHOLDER_TAG/$(tag)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
+        displayName: 'Replace variables in YAML'
       - task: kubernetes@1
         displayName: "Apply Deployment YAML"
         inputs:
