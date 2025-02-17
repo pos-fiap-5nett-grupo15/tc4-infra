@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: grafana
-        image: PLACEHOLDER_CONTAINER_REGISTRY/PLACEHOLDER_IMAGE_REPOSITORY:latest
+        image: PLACEHOLDER_CONTAINER_REGISTRY/PLACEHOLDER_IMAGE_REPOSITORY:PLACEHOLDER_TAG
         ports:
         - containerPort: 3000
         env:
