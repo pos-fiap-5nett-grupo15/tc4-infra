@@ -27,7 +27,7 @@ variables:
   vmImageName: 'ubuntu-latest'
 
   # Grafana
-  grafanaImageRepository: 'grafana'
+  imageRepository: 'grafana'
   grafanaDockerfilePath: 'grafana/Dockerfile'
 
 stages:
@@ -48,7 +48,7 @@ stages:
       displayName: Build and push an image to container registry
       inputs:
         command: buildAndPush
-        repository: $(grafanaImageRepository)
+        repository: $(imageRepository)
         dockerfile: $(grafanaDockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
