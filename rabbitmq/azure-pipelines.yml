@@ -17,6 +17,7 @@ variables:
   dockerRegistryServiceConnection: $(_dockerRegistryServiceConnection)
   containerRegistry: $(_containerRegistry)
   k8s-deployment: $(_k8s-deployment)
+  kubernetesNamespace: $(_kubernetesNamespace)
   k8sPathName: 'k8s'
   tag: '$(Build.BuildId)'
   vmImageName: 'ubuntu-latest'
@@ -81,6 +82,6 @@ stages:
         inputs:
           connectionType: 'Kubernetes Service Connection'
           kubernetesServiceEndpoint: 'fiap-aks-service-conn'
-          namespace: 'tc3'
+          namespace: $(kubernetesNamespace)
           command: apply
           arguments: -f $(System.DefaultWorkingDirectory)/rabbitmq/k8s.dev.yaml

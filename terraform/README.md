@@ -30,6 +30,11 @@ Os comando são os seguintes:
 
 4. Criar a secret do azure storage no cluster. Esta pode ser feita usando o seguinte comando:
 
+Caso a secret já exista, esta pode ser deletada:
+```shell
+kubectl delete secret tc4storage-secret -n tc4
+```
+
 ```shell
 az storage account keys list --resource-group fiap-tech-4 --account-name fiaptc4storage --query '[0].value' --output tsv | xargs -I '{}' kubectl create secret generic tc4storage-secret \
 --from-literal=azurestorageaccountname=fiaptc4storage \

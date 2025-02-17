@@ -54,3 +54,14 @@ module "sql_server_secret" {
   mssql_sa_password = var.mssql_sa_password
   svc_pass          = var.svc_pass
 }
+
+resource "kubernetes_secret" "sql_connection_string" {
+  metadata {
+    name      = "db-connection"
+    namespace = var.kube_namespace
+  }
+
+  data = {
+    ConnectionStrings__DefaultConnection  = var.db_connection
+  }
+}
