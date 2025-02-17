@@ -1,9 +1,11 @@
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
   branches:
     include:
-      - dev
-      - feat/ingress
+      - main
 
   paths:
     include:
@@ -15,9 +17,7 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  k8s-deployment: $(_k8s-deployment)
-  k8sNamespace: $(_k8sNamespace)
-  kubernetesServiceEndpoint: $(_kubernetesServiceEndpoint)
+  k8s-deployment: 'k8s-services-yaml'
   tag: '$(Build.BuildId)'
 
   # Agent VM image name
@@ -41,20 +41,15 @@ stages:
   displayName: Deploy Stage
   jobs:
   - job: DeployDatabase
-    displayName: Deploy Ingress to AKS
+    displayName: Deploy Sql Server to AKS
     steps:
       - script: ls $(System.DefaultWorkingDirectory)/ingress
         displayName: "Check folder ingress"
-
-      - script: |
-          sed -i 's/PLACEHOLDER_NAMESPACE/$(k8sNamespace)/g' $(System.DefaultWorkingDirectory)/ingress/ingress.yaml
-        displayName: 'Replace variables in YAML'
-
       - task: kubernetes@1
         displayName: "Apply Deployment YAML"
         inputs:
           connectionType: 'Kubernetes Service Connection'
-          kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
-          namespace: $(k8sNamespace)
+          kubernetesServiceEndpoint: 'fiap-aks-service-conn'
+          namespace: 'tc3'
           command: apply
           arguments: -f $(System.DefaultWorkingDirectory)/ingress/ingress.yaml
