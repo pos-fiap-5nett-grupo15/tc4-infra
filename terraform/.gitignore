@@ -1,9 +1,0 @@
-*.hcl
-/dev/.terraform/
-/dev/kube-config/.terraform/
-/dev/core/.terraform/
-*.tfstate
-*.tfstate.backup
-
-*.tfvars
-*.tfstate.lock.info
