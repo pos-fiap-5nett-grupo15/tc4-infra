@@ -27,7 +27,7 @@ variables:
   vmImageName: 'ubuntu-latest'
 
   # Grafana
-  grafanaImageRepository: 'grafana'
+  imageRepository: 'grafana'
   grafanaDockerfilePath: 'grafana/Dockerfile'
 
 stages:
@@ -48,7 +48,7 @@ stages:
       displayName: Build and push an image to container registry
       inputs:
         command: buildAndPush
-        repository: $(grafanaImageRepository)
+        repository: $(imageRepository)
         dockerfile: $(grafanaDockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
@@ -79,6 +79,7 @@ stages:
           sed -i 's/PLACEHOLDER_NAMESPACE/$(kubernetesNamespace)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
           sed -i 's/PLACEHOLDER_CONTAINER_REGISTRY/$(containerRegistry)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
           sed -i 's/PLACEHOLDER_IMAGE_REPOSITORY/$(imageRepository)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
+          sed -i 's/PLACEHOLDER_TAG/$(tag)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
         displayName: 'Replace variables in YAML'
       - task: kubernetes@1
         displayName: "Apply Deployment YAML"
