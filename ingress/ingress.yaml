@@ -35,7 +35,7 @@ spec:
             service:
               name: rabbitmq-service-management
               port:
-                number: 80
+                number: 8090
         - path: /contacts/create
           pathType: Prefix
           backend:
