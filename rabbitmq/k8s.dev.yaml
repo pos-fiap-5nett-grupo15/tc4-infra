@@ -47,6 +47,6 @@ spec:
     app: rabbitmq
   ports:
     - protocol: TCP
-      port: 8090
+      port: 80
       targetPort: 15672
   type: ClusterIP
