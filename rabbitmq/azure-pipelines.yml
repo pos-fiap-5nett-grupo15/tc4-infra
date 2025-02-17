@@ -21,7 +21,7 @@ variables:
   vmImageName: 'ubuntu-latest'
 
   # RabbitMQ
-  rabbitmqImageRepository: 'rabbitmq'
+  rabbitmqImageRepository: $(_rabbitmqImageRepository)
   rabbitmqDockerfilePath: 'rabbitmq/Dockerfile'
 
 stages:
@@ -70,10 +70,10 @@ stages:
         displayName: "Check folder RabbitMQ"
       - script: |
           cat $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
-          sed -i 's/PLACEHOLDER_NAMESPACE/$(kubernetesNamespace)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
-          sed -i 's/PLACEHOLDER_CONTAINER_REGISTRY/$(containerRegistry)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
-          sed -i 's/PLACEHOLDER_IMAGE_REPOSITORY/$(imageRepository)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
-          sed -i 's/PLACEHOLDER_TAG/$(tag)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
+          sed -i 's/PLACEHOLDER_NAMESPACE/$(kubernetesNamespace)/g' $(System.DefaultWorkingDirectory)/rabbitmq/k8s.dev.yaml
+          sed -i 's/PLACEHOLDER_CONTAINER_REGISTRY/$(containerRegistry)/g' $(System.DefaultWorkingDirectory)/rabbitmq/k8s.dev.yaml
+          sed -i 's/PLACEHOLDER_IMAGE_REPOSITORY/$(imageRepository)/g' $(System.DefaultWorkingDirectory)/rabbitmq/k8s.dev.yaml
+          sed -i 's/PLACEHOLDER_TAG/$(tag)/g' $(System.DefaultWorkingDirectory)/rabbitmq/k8s.dev.yaml
         displayName: 'Replace variables in YAML'
       - task: kubernetes@1
         displayName: "Apply Deployment YAML"
