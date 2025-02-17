@@ -27,7 +27,7 @@ variables:
   vmImageName: 'ubuntu-latest'
 
   # Prometheus
-  prometheusImageRepository: 'prometheus'
+  imageRepository: 'prometheus'
   prometheusDockerfilePath: 'prometheus/Dockerfile'
 
 
@@ -49,7 +49,7 @@ stages:
       displayName: Build and push an image to container registry
       inputs:
         command: buildAndPush
-        repository: $(prometheusImageRepository)
+        repository: $(imageRepository)
         dockerfile: $(prometheusDockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
