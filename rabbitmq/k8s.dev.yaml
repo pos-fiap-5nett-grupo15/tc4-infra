@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rabbitmq
-  namespace: tc3
+  namespace: PLACEHOLDER_NAMESPACE
   labels:
     app: rabbitmq
 spec:
@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: rabbitmq
-        image: fiaptech3acr.azurecr.io/rabbitmq:latest
+        image: PLACEHOLDER_CONTAINER_REGISTRY/PLACEHOLDER_IMAGE_REPOSITORY:PLACEHOLDER_TAG
         ports:
         - containerPort: 5672
         - containerPort: 15672
@@ -27,7 +27,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: rabbitmq-service
-  namespace: tc3
+  namespace: PLACEHOLDER_NAMESPACE
 spec:
   selector:
     app: rabbitmq
@@ -41,7 +41,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: rabbitmq-service-management
-  namespace: tc3
+  namespace: PLACEHOLDER_NAMESPACE
 spec:
   selector:
     app: rabbitmq

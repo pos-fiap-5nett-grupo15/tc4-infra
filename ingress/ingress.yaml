@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: services-ingress
-  namespace: tc3
+  namespace: PLACEHOLDER_NAMESPACE
 spec:
   ingressClassName: nginx
   rules:
@@ -36,11 +36,18 @@ spec:
               name: rabbitmq-service-management
               port:
                 number: 80
+        - path: /monitoring
+          pathType: Prefix
+          backend:
+            service:
+              name: grafana-service
+              port:
+                number: 80
         - path: /contacts/create
           pathType: Prefix
           backend:
             service:
-              name: create-contacs-service
+              name: create-contacts-service
               port:
                 number: 80 
         - path: /contacts/update

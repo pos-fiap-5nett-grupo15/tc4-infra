@@ -5,7 +5,7 @@
 trigger:
   branches:
     include:
-      - main
+      - dev
 
   paths:
     include:
@@ -17,15 +17,17 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '596527a0-844e-4fd1-af71-888334b640ff'
-  containerRegistry: 'fiaptech3acr.azurecr.io'
-  k8s-deployment: 'k8s-deployment-yaml'
-  k8sPathName: 'k8s'
+  dockerRegistryServiceConnection: $(_dockerRegistryServiceConnection)
+  containerRegistry: $(_containerRegistry)
+  k8s-deployment: $(_k8s-deployment)
+  k8sPathName: 'grafana/k8s.dev.yaml'
+  kubernetesServiceEndpoint: $(_kubernetesServiceEndpoint)
+  kubernetesNamespace: $(_k8sNamespace)
   tag: '$(Build.BuildId)'
   vmImageName: 'ubuntu-latest'
 
   # Grafana
-  grafanaImageRepository: 'grafana'
+  imageRepository: 'grafana'
   grafanaDockerfilePath: 'grafana/Dockerfile'
 
 stages:
@@ -46,7 +48,7 @@ stages:
       displayName: Build and push an image to container registry
       inputs:
         command: buildAndPush
-        repository: $(grafanaImageRepository)
+        repository: $(imageRepository)
         dockerfile: $(grafanaDockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
@@ -72,11 +74,18 @@ stages:
     steps:
       - script: ls $(System.DefaultWorkingDirectory)/grafana
         displayName: "Check folder grafana"
+      - script: |
+          cat $(System.DefaultWorkingDirectory)/sql-server/k8s.dev.yaml
+          sed -i 's/PLACEHOLDER_NAMESPACE/$(kubernetesNamespace)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
+          sed -i 's/PLACEHOLDER_CONTAINER_REGISTRY/$(containerRegistry)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
+          sed -i 's/PLACEHOLDER_IMAGE_REPOSITORY/$(imageRepository)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
+          sed -i 's/PLACEHOLDER_TAG/$(tag)/g' $(System.DefaultWorkingDirectory)/$(k8sPathName)
+        displayName: 'Replace variables in YAML'
       - task: kubernetes@1
         displayName: "Apply Deployment YAML"
         inputs:
           connectionType: 'Kubernetes Service Connection'
-          kubernetesServiceEndpoint: 'fiap-aks-service-conn'
-          namespace: 'tc3'
+          kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
+          namespace: $(kubernetesNamespace)
           command: apply
-          arguments: -f $(System.DefaultWorkingDirectory)/grafana/k8s.dev.yaml
+          arguments: -f $(System.DefaultWorkingDirectory)/$(k8sPathName)
